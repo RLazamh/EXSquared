@@ -3,7 +3,7 @@ import { parseStringPromise } from 'xml2js';
 import { VehicleXmlProvider } from '../../providers/xml/vehicle-xml.providers';
 
 @Injectable()
-export class VehicleService {
+export class VehicleDomService {
   constructor(private readonly _vehicleXmlProvider: VehicleXmlProvider) {}
 
   async getTransformedVehicleData(): Promise<any> {

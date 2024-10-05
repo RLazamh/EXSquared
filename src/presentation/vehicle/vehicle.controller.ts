@@ -1,13 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
-import { VehicleService } from '../../domain/vehicle/vehicle.service';
+import { VehicleDomService } from 'src/domain/vehicle/vehicle-dom.service';
 
 @Controller('vehicle')
 export class VehicleController {
-  constructor(private readonly _vehicleService: VehicleService) {}
+  constructor(private readonly _vehicleDomService: VehicleDomService) {}
 
   @Get('fetch-xml')
   async fetchVehicleXml() {
-    const xmlData = await this._vehicleService.getTransformedVehicleData();
+    const xmlData = await this._vehicleDomService.getTransformedVehicleData();
     return xmlData;
   }
 }
