@@ -2,16 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { of } from 'rxjs';
 import { AxiosResponse } from 'axios';
-import { VehicleApiProvider } from '../../../../src/providers/apis/vehicle-api.providers';
+import { VehicleMakesProvider } from '../../../../src/providers/apis/vehicle-makes.providers';
 
 describe('VehicleApiProvider (unit test)', () => {
-  let provider: VehicleApiProvider;
+  let provider: VehicleMakesProvider;
   let httpService: HttpService;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       providers: [
-        VehicleApiProvider,
+        VehicleMakesProvider,
         {
           provide: HttpService,
           useValue: {
@@ -21,7 +21,7 @@ describe('VehicleApiProvider (unit test)', () => {
       ],
     }).compile();
 
-    provider = moduleFixture.get<VehicleApiProvider>(VehicleApiProvider);
+    provider = moduleFixture.get<VehicleMakesProvider>(VehicleMakesProvider);
     httpService = moduleFixture.get<HttpService>(HttpService);
   });
 
@@ -46,7 +46,7 @@ describe('VehicleApiProvider (unit test)', () => {
 
       (httpService.get as jest.Mock).mockReturnValue(of(mockResponse));
 
-      const result = await provider.getVehicleXML();
+      const result = await provider.getAllMakesXML();
 
       expect(httpService.get).toHaveBeenCalledTimes(1);
       expect(result).toBe(mockXmlData);

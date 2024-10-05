@@ -1,24 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { VehicleApiProvider } from '../../providers/apis/vehicle-api.providers';
+import { VehicleMakesProvider } from '../../providers/apis/vehicle-makes.providers';
+import { VehicleMakeIdProvider } from '../../providers/apis/vehicle-make-id.providers';
 
 @Injectable()
 export class VehicleDomService {
-  constructor(private readonly _vehicleApiProvider: VehicleApiProvider) {}
+  constructor(
+    private readonly _vehicleMakesProvider: VehicleMakesProvider,
+    private readonly _vehicleMakeIdProvider: VehicleMakeIdProvider,
+  ) {}
 
-  async getTransformedVehicleData(): Promise<any[]> {
-    const vehicle = await this._vehicleApiProvider.getVehicleJSON();
+  async getVehicleMakeData(): Promise<any[]> {
+    const vehicles = await this._vehicleMakesProvider.getAllMakesJSON();
+    return vehicles;
+  }
 
-    const validMakes = vehicle.filter((data: any) => {
-      if (!data.Make_ID || !data.Make_Name) {
-        console.warn(`Data no valid: ${JSON.stringify(data)}`);
-        return false;
-      }
-      return true;
-    });
-
-    return validMakes.map((vehicle) => ({
-      makeId: vehicle.Make_ID.trim(),
-      makeName: vehicle.Make_Name.trim(),
-    }));
+  async getVehicleMakeByIdData(vehicleId: string): Promise<any> {
+    const vehicles = await this._vehicleMakeIdProvider.getMakeByIdJSON(
+      vehicleId,
+    );
+    return vehicles;
   }
 }

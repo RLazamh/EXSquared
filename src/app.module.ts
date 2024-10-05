@@ -6,6 +6,7 @@ import { VehicleModule } from './presentation/vehicle/vehicle.module';
   imports: [
     ConfigModule.forRoot({
       envFilePath: 'dev.env',
+      isGlobal: true,
     }),
     VehicleModule,
   ],

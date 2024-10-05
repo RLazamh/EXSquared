@@ -2,22 +2,25 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { parseStringPromise } from 'xml2js';
+import { ENDPOINTS } from './endpoint';
 
 @Injectable()
-export class VehicleApiProvider {
-  constructor(private readonly httpService: HttpService) {}
+export class VehicleMakesProvider {
+  BASE_URL_VEHICLE_PROVIDER = process.env.BASE_URL_VEHICLE_PROVIDER;
 
-  async getVehicleXML(): Promise<string> {
+  constructor(private readonly _httpService: HttpService) {}
+
+  async getAllMakesXML(): Promise<string> {
     const response = await firstValueFrom(
-      this.httpService.get(
-        'https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?format=XML',
+      this._httpService.get(
+        `${this.BASE_URL_VEHICLE_PROVIDER}${ENDPOINTS.getAllMakesXML}`,
       ),
     );
     return response.data;
   }
 
-  async getVehicleJSON(): Promise<any> {
-    const xmlData = await this.getVehicleXML();
+  async getAllMakesJSON(): Promise<any[]> {
+    const xmlData = await this.getAllMakesXML();
     const jsonData = await parseStringPromise(xmlData, {
       explicitArray: false,
       mergeAttrs: true,
