@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { parseStringPromise } from 'xml2js';
-import { VehicleXmlProvider } from '../../../../src/providers/xml/vehicle-xml.providers';
 import { VehicleDomService } from '../../../../src/domain/vehicle/vehicle-dom.service';
+import { VehicleApiProvider } from '../../../../src/providers/apis/vehicle-api.providers';
 
 jest.mock('xml2js', () => ({
   parseStringPromise: jest.fn().mockResolvedValue({
@@ -9,26 +8,27 @@ jest.mock('xml2js', () => ({
   }),
 }));
 
-describe('VehicleXmlProvider (unit test)', () => {
+describe('VehicleApiProvider (unit test)', () => {
   let vehicleDomService: VehicleDomService;
-  let vehicleXmlProvider: VehicleXmlProvider;
+  let vehicleApiProvider: VehicleApiProvider;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       providers: [
         VehicleDomService,
         {
-          provide: VehicleXmlProvider,
+          provide: VehicleApiProvider,
           useFactory: () => ({
-            getVehicleData: jest.fn(),
+            getVehiclexml: jest.fn(),
+            getVehicleJSON: jest.fn(),
           }),
         },
       ],
     }).compile();
 
     vehicleDomService = moduleFixture.get<VehicleDomService>(VehicleDomService);
-    vehicleXmlProvider =
-      moduleFixture.get<VehicleXmlProvider>(VehicleXmlProvider);
+    vehicleApiProvider =
+      moduleFixture.get<VehicleApiProvider>(VehicleApiProvider);
   });
 
   afterEach(async () => {
@@ -37,27 +37,20 @@ describe('VehicleXmlProvider (unit test)', () => {
 
   it('should be defined', () => {
     expect(vehicleDomService).toBeDefined();
-    expect(vehicleXmlProvider).toBeDefined();
+    expect(VehicleApiProvider).toBeDefined();
   });
 
   describe('getTransformedVehicleData', () => {
-    it('should call VehicleXmlProvider to get XML data and transform it to JSON', async () => {
-      const mockXmlData =
-        '<vehicles><vehicle><id>1</id><make>Toyota</make><model>Corolla</model></vehicle></vehicles>';
-      (vehicleXmlProvider.getVehicleData as jest.Mock).mockResolvedValue(
-        mockXmlData,
+    it('should call VehicleApiProvider to get XML data and transform it to JSON', async () => {
+      const mockJSONData = [{ Make_ID: '1', Make_Name: 'Toyota' }];
+      (vehicleApiProvider.getVehicleJSON as jest.Mock).mockResolvedValue(
+        mockJSONData,
       );
 
       const result = await vehicleDomService.getTransformedVehicleData();
 
-      expect(vehicleXmlProvider.getVehicleData).toHaveBeenCalledTimes(1);
-      expect(parseStringPromise).toHaveBeenCalledWith(mockXmlData, {
-        explicitArray: false,
-        mergeAttrs: true,
-      });
-      expect(result).toEqual({
-        vehicles: [{ id: '1', make: 'Toyota', model: 'Corolla' }],
-      });
+      expect(vehicleApiProvider.getVehicleJSON).toHaveBeenCalledTimes(1);
+      expect(result).toEqual([{ makeId: '1', makeName: 'Toyota' }]);
     });
   });
 });

@@ -1,13 +1,15 @@
 import { Controller, Get } from '@nestjs/common';
-import { VehicleDomService } from 'src/domain/vehicle/vehicle-dom.service';
+import { ProcessVehicleXmlUseCase } from '../../application/vehicle/process-vehicle-xml.usecase';
 
 @Controller('vehicle')
 export class VehicleController {
-  constructor(private readonly _vehicleDomService: VehicleDomService) {}
+  constructor(
+    private readonly _processVehicleXmlUseCase: ProcessVehicleXmlUseCase,
+  ) {}
 
   @Get('fetch-xml')
   async fetchVehicleXml() {
-    const xmlData = await this._vehicleDomService.getTransformedVehicleData();
+    const xmlData = await this._processVehicleXmlUseCase.execute();
     return xmlData;
   }
 }

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
-import { VehicleXmlProvider } from './xml/vehicle-xml.providers';
+import { VehicleApiProvider } from './apis/vehicle-api.providers';
 
 @Module({
   imports: [HttpModule],
-  providers: [VehicleXmlProvider],
-  exports: [VehicleXmlProvider],
+  providers: [VehicleApiProvider],
+  exports: [VehicleApiProvider],
 })
 export class ProvidersModule {}
