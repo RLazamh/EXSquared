@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { parseStringPromise } from 'xml2js';
-import { VehicleService } from '../../../../src/domain/vehicle/vehicle.service';
 import { VehicleXmlProvider } from '../../../../src/providers/xml/vehicle-xml.providers';
+import { VehicleDomService } from '../../../../src/domain/vehicle/vehicle-dom.service';
 
 jest.mock('xml2js', () => ({
   parseStringPromise: jest.fn().mockResolvedValue({
@@ -9,14 +9,14 @@ jest.mock('xml2js', () => ({
   }),
 }));
 
-describe('VehicleService (unit test)', () => {
-  let vehicleService: VehicleService;
+describe('VehicleXmlProvider (unit test)', () => {
+  let vehicleDomService: VehicleDomService;
   let vehicleXmlProvider: VehicleXmlProvider;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       providers: [
-        VehicleService,
+        VehicleDomService,
         {
           provide: VehicleXmlProvider,
           useFactory: () => ({
@@ -26,7 +26,7 @@ describe('VehicleService (unit test)', () => {
       ],
     }).compile();
 
-    vehicleService = moduleFixture.get<VehicleService>(VehicleService);
+    vehicleDomService = moduleFixture.get<VehicleDomService>(VehicleDomService);
     vehicleXmlProvider =
       moduleFixture.get<VehicleXmlProvider>(VehicleXmlProvider);
   });
@@ -36,7 +36,7 @@ describe('VehicleService (unit test)', () => {
   });
 
   it('should be defined', () => {
-    expect(vehicleService).toBeDefined();
+    expect(vehicleDomService).toBeDefined();
     expect(vehicleXmlProvider).toBeDefined();
   });
 
@@ -48,7 +48,7 @@ describe('VehicleService (unit test)', () => {
         mockXmlData,
       );
 
-      const result = await vehicleService.getTransformedVehicleData();
+      const result = await vehicleDomService.getTransformedVehicleData();
 
       expect(vehicleXmlProvider.getVehicleData).toHaveBeenCalledTimes(1);
       expect(parseStringPromise).toHaveBeenCalledWith(mockXmlData, {
