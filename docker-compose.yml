@@ -1,15 +1,42 @@
 version: '3.8'
+
 services:
-  mongodb:
-    image: mongo:5.0
-    container_name: mongodb_vehicle
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nest-app
     ports:
-      - "27017:27017"
+      - "3050:3050"
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+      HOST: 0.0.0.0
+      MONGO_HOST: mongodb
+      PORT_SERVICE: 3050
+
+    volumes:
+      - .:/app
+
+  mongodb:
+    image: mongo:5.0 
+    container_name: mongodb
+    ports:
+      - "27017:27017" 
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     volumes:
       - ./data/db:/data/db
     env_file:
-      - .env
+      - .env 
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+

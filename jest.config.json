@@ -9,11 +9,15 @@
   "collectCoverageFrom": [
     "src/**/*.ts",
     "!**/node_modules/**",
+    "!src/application/common/**/*",
     "!**/tests/**"
   ],
   "coveragePathIgnorePatterns": [
     "\\.module\\.ts$",
     "\\.entity\\.ts$",
+    "\\.dto\\.ts$",
+    "\\.config\\.ts$",
+    "\\endpoint\\.ts$",
     "/infrastructure/db/migration/"
   ]
 }

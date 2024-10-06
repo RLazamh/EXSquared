@@ -3,13 +3,7 @@ import { VehicleDomService } from '../../../../src/domain/vehicle/vehicle-dom.se
 import { VehicleMakesProvider } from '../../../../src/providers/apis/vehicle-makes.providers';
 import { VehicleMakeIdProvider } from '../../../../src/providers/apis/vehicle-make-id.providers';
 
-jest.mock('xml2js', () => ({
-  parseStringPromise: jest.fn().mockResolvedValue({
-    vehicles: [{ id: '1', make: 'Toyota', model: 'Corolla' }],
-  }),
-}));
-
-describe('VehicleApiProvider (unit test)', () => {
+describe('VehicleDomService (unit test)', () => {
   let vehicleDomService: VehicleDomService;
   let vehicleMakesProvider: VehicleMakesProvider;
   let vehicleMakeIdProvider: VehicleMakeIdProvider;
@@ -21,15 +15,13 @@ describe('VehicleApiProvider (unit test)', () => {
         {
           provide: VehicleMakesProvider,
           useFactory: () => ({
-            getVehiclexml: jest.fn(),
-            getVehicleJSON: jest.fn(),
+            getAllMakesJSON: jest.fn(),
           }),
         },
         {
           provide: VehicleMakeIdProvider,
           useFactory: () => ({
-            getVehiclexml: jest.fn(),
-            getVehicleJSON: jest.fn(),
+            getMakeByIdJSON: jest.fn(),
           }),
         },
       ],
@@ -51,5 +43,35 @@ describe('VehicleApiProvider (unit test)', () => {
     expect(vehicleDomService).toBeDefined();
     expect(vehicleMakesProvider).toBeDefined();
     expect(vehicleMakeIdProvider).toBeDefined();
+  });
+
+  describe('getVehicleMakeData', () => {
+    it('should call getAllMakesJSON from VehicleMakesProvider and return data', async () => {
+      const mockVehicleData = [{ make: 'Toyota' }];
+      (vehicleMakesProvider.getAllMakesJSON as jest.Mock).mockResolvedValue(
+        mockVehicleData,
+      );
+
+      const result = await vehicleDomService.getVehicleMakeData();
+
+      expect(vehicleMakesProvider.getAllMakesJSON).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(mockVehicleData);
+    });
+  });
+
+  describe('getVehicleMakeByIdData', () => {
+    it('should call getMakeByIdJSON from VehicleMakeIdProvider and return data', async () => {
+      const mockVehicleByIdData = [
+        { id: '1', make: 'Toyota', model: 'Corolla' },
+      ];
+      (vehicleMakeIdProvider.getMakeByIdJSON as jest.Mock).mockResolvedValue(
+        mockVehicleByIdData,
+      );
+
+      const result = await vehicleDomService.getVehicleMakeByIdData('1');
+
+      expect(vehicleMakeIdProvider.getMakeByIdJSON).toHaveBeenCalledWith('1');
+      expect(result).toEqual(mockVehicleByIdData);
+    });
   });
 });

@@ -63,7 +63,6 @@ export class ProcessVehicleDataUseCase {
         `Error processing vehicles - Tracking ID: ${trackingId}`,
         error.stack,
       );
-      throw error;
     }
   }
 
@@ -77,8 +76,8 @@ export class ProcessVehicleDataUseCase {
 
     const vehicleTypes = (Array.isArray(moreInfo) ? moreInfo : [moreInfo]).map(
       (type) => ({
-        typeId: type.VehicleTypeId?.trim(),
-        typeName: type.VehicleTypeName?.trim(),
+        typeId: type?.VehicleTypeId ? type.VehicleTypeId.trim() : null,
+        typeName: type?.VehicleTypeName ? type.VehicleTypeName.trim() : null,
       }),
     );
 
