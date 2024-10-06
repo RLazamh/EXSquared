@@ -8,8 +8,8 @@ export class ProcessVehicleXmlUseCase {
 
   async execute(): Promise<any[]> {
     const limiter = new Bottleneck({
-      maxConcurrent: 30,
-      minTime: 50,
+      maxConcurrent: 200,
+      minTime: 300,
     });
 
     const vehicles = await this._vehicleDomService.getVehicleMakeData();
@@ -19,6 +19,8 @@ export class ProcessVehicleXmlUseCase {
       if (!vehicle || !vehicle.Make_ID || !vehicle.Make_Name) {
         continue;
       }
+
+      console.log('EXECUTANDO', vehicle.Make_ID);
 
       const transformedVehicle = await limiter.schedule(async () => {
         const moreInfo = await this._vehicleDomService.getVehicleMakeByIdData(

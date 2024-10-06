@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ProcessVehicleXmlUseCase } from '../../application/vehicle/process-vehicle-xml.usecase';
+import { ProcessVehicleXmlUseCase } from '../../application/vehicle/process-vehicle-data.usecase';
 import { VehicleDomService } from '../../domain/vehicle/vehicle-dom.service';
 import { ProvidersModule } from '../../providers/providers.module';
 import { VehicleController } from './vehicle.controller';

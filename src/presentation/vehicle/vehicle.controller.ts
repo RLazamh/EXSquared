@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { ProcessVehicleXmlUseCase } from '../../application/vehicle/process-vehicle-xml.usecase';
+import { ProcessVehicleXmlUseCase } from '../../application/vehicle/process-vehicle-data.usecase';
 
 @Controller('vehicle')
 export class VehicleController {
