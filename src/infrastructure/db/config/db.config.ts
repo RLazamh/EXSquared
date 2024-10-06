@@ -17,3 +17,4 @@ export const getMongoConfig = (configService: ConfigService) => {
 
   return { uri: MONGODB_URI };
 };
+// mongodb://admin:admin@mongodb_vehicle:27017/vehicle?authSource=admi
