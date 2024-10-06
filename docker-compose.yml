@@ -11,7 +11,7 @@ services:
     depends_on:
       - mongodb
     networks:
-      - app-network
+      - shared-network
     environment:
       HOST: 0.0.0.0
       MONGO_HOST: mongodb
@@ -34,9 +34,8 @@ services:
     env_file:
       - .env 
     networks:
-      - app-network
+      - shared-network
 
 networks:
-  app-network:
+  shared-network:
     driver: bridge
-
