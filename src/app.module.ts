@@ -1,13 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { VehicleModule } from './presentation/vehicle/vehicle.module';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
-      envFilePath: 'dev.env',
+      envFilePath: '.env',
+      isGlobal: true,
     }),
+    VehicleModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}
