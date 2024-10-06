@@ -1,26 +1,34 @@
-import { Injectable } from '@nestjs/common';
-import { VehicleDomService } from '../../domain/vehicle/vehicle-dom.service';
+import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import Bottleneck from 'bottleneck';
+import { VehicleDomService } from '../../domain/vehicle/vehicle-dom.service';
+import { VehicleDBService } from '../../infrastructure/db/services/vehicle/vehicle-db.service'; // Ajusta la ruta según tu estructura
+import { VEHICLE } from '../events/common';
 
 @Injectable()
-export class ProcessVehicleXmlUseCase {
-  constructor(private readonly _vehicleDomService: VehicleDomService) {}
+export class ProcessVehicleDataUseCase {
+  private readonly logger = new Logger(ProcessVehicleDataUseCase.name);
 
-  async execute(): Promise<any[]> {
+  constructor(
+    private readonly _vehicleDomService: VehicleDomService,
+    private readonly _eventEmitter: EventEmitter2,
+    private readonly _vehicleDBService: VehicleDBService,
+  ) {}
+
+  async execute(): Promise<void> {
     const limiter = new Bottleneck({
       maxConcurrent: 200,
       minTime: 300,
     });
 
     const vehicles = await this._vehicleDomService.getVehicleMakeData();
-    const results = [];
+    const batchSize = 100;
+    const batch: any[] = [];
 
     for (const vehicle of vehicles) {
       if (!vehicle || !vehicle.Make_ID || !vehicle.Make_Name) {
         continue;
       }
-
-      console.log('EXECUTANDO', vehicle.Make_ID);
 
       const transformedVehicle = await limiter.schedule(async () => {
         const moreInfo = await this._vehicleDomService.getVehicleMakeByIdData(
@@ -44,10 +52,21 @@ export class ProcessVehicleXmlUseCase {
       });
 
       if (transformedVehicle) {
-        results.push(transformedVehicle);
+        batch.push(transformedVehicle);
+      }
+
+      if (batch.length >= batchSize) {
+        this._eventEmitter.emit(VEHICLE.SAVE_OR_UPDATE, batch);
+        await this._vehicleDBService.saveOrUpdateVehicles(batch);
+        batch.length = 0;
       }
     }
 
-    return results;
+    if (batch.length > 0) {
+      this._eventEmitter.emit(VEHICLE.SAVE_OR_UPDATE, batch);
+      await this._vehicleDBService.saveOrUpdateVehicles(batch);
+    }
+
+    this.logger.log('proccess end up with successful.');
   }
 }

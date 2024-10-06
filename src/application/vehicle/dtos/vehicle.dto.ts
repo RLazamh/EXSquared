@@ -1,4 +1,4 @@
-import { IsString, IsArray, ValidateNested } from 'class-validator';
+import { IsString, IsArray, ValidateNested, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class VehicleTypeDto {
@@ -19,5 +19,6 @@ export class VehicleDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => VehicleTypeDto)
-  vehicleTypes: VehicleTypeDto[];
+  @IsOptional()
+  vehicleTypes?: VehicleTypeDto[];
 }
