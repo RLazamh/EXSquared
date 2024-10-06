@@ -9,4 +9,7 @@ export const ENVIRONMENT = {
   bottleneckMinTime: process.env.BOTTLENECK_MIN_TIME
     ? parseInt(process.env.BOTTLENECK_MIN_TIME, 10)
     : 300,
+  batchSizeProcessing: process.env.BATCH_SIZE_PROCESSING
+    ? parseInt(process.env.BATCH_SIZE_PROCESSING, 10)
+    : 20,
 };

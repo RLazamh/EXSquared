@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import Bottleneck from 'bottleneck';
 import { VehicleDomService } from '../../domain/vehicle/vehicle-dom.service';
-import { VehicleDBService } from '../../infrastructure/db/services/vehicle/vehicle-db.service';
 import { VEHICLE } from '../common/events';
 import { ENVIRONMENT } from '../common/enviroment';
 import { VehicleDto } from './dtos/vehicle.dto';
@@ -13,7 +12,6 @@ export class ProcessVehicleDataUseCase {
 
   constructor(
     private readonly _vehicleDomService: VehicleDomService,
-    private readonly _vehicleDBService: VehicleDBService,
     private readonly _eventEmitter: EventEmitter2,
   ) {}
 
@@ -27,7 +25,7 @@ export class ProcessVehicleDataUseCase {
       minTime: ENVIRONMENT.bottleneckMinTime,
     });
     const batch: VehicleDto[] = [];
-    const batchSize = 100;
+    const batchSize = ENVIRONMENT.batchSizeProcessing;
 
     try {
       const vehicles = await this._vehicleDomService.getVehicleMakeData();
@@ -35,7 +33,9 @@ export class ProcessVehicleDataUseCase {
       for (const vehicle of vehicles) {
         if (!vehicle || !vehicle.Make_ID || !vehicle.Make_Name) {
           this.logger.warn(
-            `Skipping invalid vehicle data vehicle: ${vehicle} - Tracking ID: ${trackingId}`,
+            `Invalid vehicle data: ${JSON.stringify(
+              vehicle,
+            )} - Tracking ID: ${trackingId}`,
           );
           continue;
         }
@@ -89,11 +89,10 @@ export class ProcessVehicleDataUseCase {
     };
   }
 
-  private async saveBatch(batch: any[], trackingId: string) {
+  private async saveBatch(batch: VehicleDto[], trackingId: string) {
     this.logger.log(
       `Saving batch with size: ${batch.length} - Tracking ID: ${trackingId}`,
     );
-    this._eventEmitter.emit(VEHICLE.SAVE_OR_UPDATE, batch);
-    await this._vehicleDBService.saveOrUpdateVehicles(batch);
+    this._eventEmitter.emit(VEHICLE.SAVE_OR_UPDATE, [...batch]);
   }
 }
